@@ -6,11 +6,25 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 
+/**
+ * Sends generated patient data to a connected client using a TCP connection.
+ * This class starts a simple TCP server that waits for a client to connect.
+ * Once a connection is established, it sends formatted data messages (e.g., alerts, heart rate) over the network.
+ */
+
 public class TcpOutputStrategy implements OutputStrategy {
 
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private PrintWriter out;
+
+    /**
+     * {@code TcpOutputStrategy} starts a TCP server on the given port and waits for a client to connect.
+     *
+     * The server accepts one client and sets up an output stream to send data.
+     *
+     * @param port the port number to listen on
+     */
 
     public TcpOutputStrategy(int port) {
         try {
@@ -31,6 +45,15 @@ public class TcpOutputStrategy implements OutputStrategy {
             e.printStackTrace();
         }
     }
+
+    /**
+     * {@code output} sends a formatted data message to the connected client.
+     *
+     * @param patientId the ID of the patient
+     * @param timestamp the current time in milliseconds
+     * @param label     the type of data
+     * @param data      the actual data value
+     */
 
     @Override
     public void output(int patientId, long timestamp, String label, String data) {
