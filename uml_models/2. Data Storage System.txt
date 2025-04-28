@@ -1,0 +1,12 @@
+Data Storage System is designed to store and manage time-stamped patient vitals data 
+while enabling efficient retrieval for both real-time monitoring and historical analysis. 
+Main design components include:  
+DataStorage: serves as the central repository, using a patient ID-based mapping system to 
+organize records chronologically. It provides methods for adding new data entries, 
+retrieving records by patient ID and time range, and deleting outdated records. 
+PatientRecord: contains measurement values, types, and precise timestamps.  
+AccessControl: enforces permission checks, ensuring only authorized medical staff 
+can retrieve sensitive patient data through the DataRetriever.  
+DataRetriever: uses storage to fetch records and interacts with AccessControl to 
+verify user permissions before data access. This ensures secure retrieval by enforcing access restrictions.
+DataDeletion: handles data deletion. It encapsulates policies like removing records older than a specified number of days. 
