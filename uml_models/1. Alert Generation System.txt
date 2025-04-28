@@ -1,0 +1,6 @@
+Alert Generation System diagram represents a real-time alert generation system for monitoring patient vitals, using personalized thresholds to trigger alerts when abnormal conditions are detected. Main design components are: 
+TresholdValidator: contains validation methods for different alert rules (e.g. “threshold: blood pressure > 100”) and returns a boolean value indicating whether a given condition is met or not. 
+AlertGenerator: evaluates patient data against thresholds from TresholdValidator using the DataStorage component to retrieve records. When thresholds are exceeded, it creates Alert objects containing patient ID, condition, and timestamp.
+AlertManager: receives and dispatches alerts, ensuring that they are routed to the medical personnel. This decouples the alert handling logic from the core evaluation logic, what improves flexibility of the system. 
+DataStorage: maintains a map of Patient objects. 
+Patient: contains a list of patientRecords, representing time-stamped measurements.
