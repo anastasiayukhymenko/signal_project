@@ -1,0 +1,11 @@
+Patients Identification System models a patient identification system 
+ensuring each incoming measurement correctly matches the intended patient. 
+The main design components include:  
+IdentityManager: monitors the entire identification process. It manages an 
+instance of PatientIdentifier. It also retrieves patient information from 
+the Patient class to validate records and maintain data consistency 
+(wrongPatient() method allows for exception management).
+PatientIdentifier: contains the logic to match incoming data 
+(i.e.: patient ID, measurement, type, and timestamp) to the correct PatientRecord.
+PatientRecord: maintains a complete, fixed history of all identification events  
+Patient: represents the patient as a whole, owning a list of all their records. 

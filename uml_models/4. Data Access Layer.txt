@@ -1,0 +1,15 @@
+
+Data Access Layer represents a health monitoring system, 
+responsible for retrieving and processing patient data from external sources such as 
+TCP streams, WebSockets, and files. Its main design components include: 
+DataListener interface: defines a common contract 
+(startListening() and stopListening()) for all types of data sources. 
+This abstraction allows the system to remain flexible and easily extendable- new types 
+of data sources can be integrated without modifying the rest of the system. 
+Three classes- TCPDataListener, WebSocketDataListener, and FileDataListener—realize this 
+interface, each following specific rules or input format. 
+DataParser: parses the data collected by listeners. 
+It transforms raw input (i.e.: JSON, CSV) into structured PatientRecord objects. 
+DataSourceAdapter: acts as a mediator between the parsing logic and the system's internal storage. 
+It uses the parser and forwards structured records to DataStorage.
+DataStorage: stores patient data in a map and provides methods to retrieve and query it.
