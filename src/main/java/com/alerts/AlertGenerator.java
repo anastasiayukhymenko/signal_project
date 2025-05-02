@@ -129,6 +129,7 @@ public class AlertGenerator {
                 break;
             }
         }
+
     }
 
     public void evaluateBloodSaturation(Patient patient) {
@@ -256,4 +257,5 @@ public class AlertGenerator {
             }
         }
     }
+
 }
