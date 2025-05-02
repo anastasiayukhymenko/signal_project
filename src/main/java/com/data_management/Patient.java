@@ -39,6 +39,9 @@ public class Patient {
         PatientRecord record = new PatientRecord(this.patientId, measurementValue, recordType, timestamp);
         this.patientRecords.add(record);
     }
+    public int getPatientId() {
+        return patientId;
+    }
 
     /**
      * Retrieves a list of PatientRecord objects for this patient that fall within a
@@ -53,5 +56,8 @@ public class Patient {
      */
     public List<PatientRecord> getRecords(long startTime, long endTime) {
         return null;
+    }
+    public List<PatientRecord> getAllRecords() {
+        return new ArrayList<>(patientRecords); // Return a copy to prevent external modification
     }
 }
