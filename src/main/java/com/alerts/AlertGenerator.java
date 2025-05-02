@@ -54,6 +54,10 @@ public class AlertGenerator {
      */
     public void evaluateData(Patient patient) {
         // Implementation goes here
+        evaluateBloodPressureTrends(patient);
+        evaluateHypotensiveHypoxemia(patient);
+        evaluateECGAbnormalities(patient);
+        evaluateTriggeredAlert(patient);
     }
 
     /**
@@ -194,4 +198,20 @@ public class AlertGenerator {
             }
         }
     }
+    public void evaluateTriggeredAlert(Patient patient) {
+        Optional<PatientRecord> latestTriggeredRecord = patient.getAllRecords().stream()
+                .filter(r -> r.getRecordType().equals("TriggeredAlert"))
+                .max(Comparator.comparingLong(PatientRecord::getTimestamp));
+    
+        if (latestTriggeredRecord.isPresent()) {
+            PatientRecord record = latestTriggeredRecord.get();
+            if (record.getMeasurementValue() == 1.0) {
+                triggerAlert(new Alert(
+                        String.valueOf(patient.getPatientId()),
+                        "Manual Alert: Bedside alert button was triggered",
+                        record.getTimestamp()
+                ));
+            }
+        }
+    }    
 }
