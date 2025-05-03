@@ -62,7 +62,13 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.cardio_generator.HealthDataSimulator</mainClass>
+                    <archive>
+                    <manifest>
+                        <addClasspath>true</addClasspath>
+                        <mainClass>com.yourpackage.Main</mainClass>
+                    </manifest>
+                </archive>
+
                 </configuration>
             </plugin>
 
