@@ -68,7 +68,8 @@ public class AlertGenerator {
      *
      * @param alert the alert object containing details about the alert condition
      */
-    private void triggerAlert(Alert alert) {
+    // made class from private (originally) to protected (because can not test )
+    protected void triggerAlert(Alert alert) {
         // Implementation might involve logging the alert or notifying staff
     }
 

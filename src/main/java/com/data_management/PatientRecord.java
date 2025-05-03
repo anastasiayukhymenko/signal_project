@@ -67,4 +67,10 @@ public class PatientRecord {
     public String getRecordType() {
         return recordType;
     }
+
+    @Override
+    public String toString() {
+        return "Patient ID: " + patientId + ", Record Type: " + recordType + ", Measurement Value: "
+                + measurementValue + ", Timestamp: " + timestamp;
+    }
 }
