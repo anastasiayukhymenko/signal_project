@@ -1,0 +1,8 @@
+We didn’t write tests for the com.cardio_generator.HealthDataSimulator class because it just simulates random data and
+was given to us at the start of the project. We didn’t change anything in it, so we didn’t find it important to test.
+
+The com.cardio_generator.outputs package has low test coverage, especially for TcpOutputStrategy and WebSocketOutputStrategy.
+These involve networking and are harder to test with JUnit, and we haven’t learned how to test that yet.
+
+We also didn’t write a test for the main method.
+All other packages and classes have good test coverage.
