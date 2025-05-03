@@ -31,8 +31,10 @@ class FileDataReaderTest {
         Files.deleteIfExists(tempDir);
     }
 
+
     @Test
     void testReadDataAddsRecordsCorrectly() throws IOException {
+        DataStorage.getInstance().clear();
         DataStorage dataStorage = DataStorage.getInstance();
         FileDataReader reader = new FileDataReader(tempDir.toString());
 
@@ -40,7 +42,7 @@ class FileDataReaderTest {
 
         // Validate records for patient 101
         List<PatientRecord> records101 = dataStorage.getRecords(101, 0L, Long.MAX_VALUE);
-        assertEquals(2, records101.size());
+        assertEquals(2, records101.size()); // Ensure only 2 records for patient 101
 
         PatientRecord firstRecord = records101.get(0);
         assertEquals(101, firstRecord.getPatientId());
@@ -50,11 +52,12 @@ class FileDataReaderTest {
 
         // Validate records for patient 102
         List<PatientRecord> records102 = dataStorage.getRecords(102, 0L, Long.MAX_VALUE);
-        assertEquals(1, records102.size());
+        assertEquals(1, records102.size()); // Ensure only 1 record for patient 102
 
         PatientRecord secondRecord = records102.get(0);
         assertEquals("BloodPressure", secondRecord.getRecordType());
     }
+
 
     @Test
     void testHandlesMalformedLinesGracefully() throws IOException {
