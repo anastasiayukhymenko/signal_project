@@ -96,5 +96,5 @@ class DataStorageTest {
         assertTrue(patients.stream().anyMatch(patient -> patient.getPatientId() == 1));
         assertTrue(patients.stream().anyMatch(patient -> patient.getPatientId() == 2));
     }
-
+    
 }

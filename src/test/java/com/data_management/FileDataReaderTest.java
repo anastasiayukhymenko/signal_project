@@ -33,7 +33,7 @@ class FileDataReaderTest {
 
     @Test
     void testReadDataAddsRecordsCorrectly() throws IOException {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         FileDataReader reader = new FileDataReader(tempDir.toString());
 
         reader.readData(dataStorage);
@@ -60,7 +60,7 @@ class FileDataReaderTest {
     void testHandlesMalformedLinesGracefully() throws IOException {
         Files.writeString(testFile, "\nBAD_LINE\n123,abc,BadType,XYZ\n", StandardOpenOption.APPEND);
 
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         FileDataReader reader = new FileDataReader(tempDir.toString());
 
         assertDoesNotThrow(() -> reader.readData(dataStorage));
@@ -77,7 +77,7 @@ class FileDataReaderTest {
     @Test
     void testInvalidDirectoryThrowsException() {
         FileDataReader reader = new FileDataReader("invalid/path");
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
 
         assertThrows(IOException.class, () -> reader.readData(dataStorage));
     }
