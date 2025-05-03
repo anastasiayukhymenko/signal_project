@@ -1,4 +1,4 @@
-package com.generators;
+package com.cardio_generator.generators;
 
 public class BloodLevelDataGeneratorTest {
     
