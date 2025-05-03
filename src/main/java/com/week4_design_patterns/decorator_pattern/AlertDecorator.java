@@ -1,8 +1,6 @@
 package com.week4_design_patterns.decorator_pattern;
 
-import com.alerts.Alert;
-
-public class AlertDecorator extends Alert {
+public class AlertDecorator implements Alert {
     private Alert alert;
     private String additionalInfo;
 
