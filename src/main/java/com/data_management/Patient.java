@@ -2,6 +2,7 @@ package com.data_management;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents a patient and manages their medical records.
@@ -66,4 +67,11 @@ public class Patient {
     public List<PatientRecord> getAllRecords() {
         return new ArrayList<>(patientRecords); // Return a copy to prevent external modification
     }
+   /* public List<PatientRecord> getRecordsByType(String type) {
+        return patientRecords.stream()
+                .filter(record -> type.equals(record.getRecordType()))
+                .collect(Collectors.toList());
+    }
+
+    */
 }
