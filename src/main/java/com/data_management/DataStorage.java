@@ -120,4 +120,8 @@ public class DataStorage {
             alertGenerator.evaluateData(patient);
         }
     }
+    
+    public void clear() {
+        this.patientMap.clear();
+    }
 }

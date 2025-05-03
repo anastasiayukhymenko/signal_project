@@ -8,12 +8,19 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 class DataStorageTest {
+
+    @BeforeEach
+    void clearSingletonInstance() {
+        DataStorage storage = DataStorage.getInstance();
+        storage.clear();
+    }
+
     @Test
     void testAddAndGetRecords() {
         // TODO Perhaps you can implement a mock data reader to mock the test data?
          DataReader reader = Mockito.mock(DataReader.class);
 
-        DataStorage storage = new DataStorage(reader);
+        DataStorage storage = DataStorage.getInstance();
         storage.addPatientData(1, 100.0, "WhiteBloodCells", 1714376789050L);
         storage.addPatientData(1, 200.0, "WhiteBloodCells", 1714376789051L);
 
@@ -21,16 +28,11 @@ class DataStorageTest {
         assertEquals(2, records.size()); // Check if two records are retrieved
         assertEquals(100.0, records.get(0).getMeasurementValue()); // Validate first record
     }
-    private DataStorage storage;
-
-    @BeforeEach
-    void setUp() {
-        storage = new DataStorage();
-    }
 
     @Test
     void testAddPatientData_NewPatient() {
         // Add new patient data
+        DataStorage storage = DataStorage.getInstance();
         storage.addPatientData(1, 100.0, "HeartRate", 1714376789050L);
 
         // Check if the data has been added correctly
@@ -42,6 +44,7 @@ class DataStorageTest {
 
     @Test
     void testAddPatientData_ExistingPatient() {
+        DataStorage storage = DataStorage.getInstance();
         // Add data to an existing patient
         storage.addPatientData(1, 100.0, "HeartRate", 1714376789050L);
         storage.addPatientData(1, 120.0, "HeartRate", 1714376789051L);
@@ -56,6 +59,7 @@ class DataStorageTest {
 
     @Test
     void testGetRecords_ValidTimeRange() {
+        DataStorage storage = DataStorage.getInstance();
         // Add data to a patient
         storage.addPatientData(1, 100.0, "HeartRate", 1714376789050L);
         storage.addPatientData(1, 120.0, "HeartRate", 1714376789051L);
@@ -68,6 +72,7 @@ class DataStorageTest {
 
     @Test
     void testGetRecords_NoRecordsInRange() {
+        DataStorage storage = DataStorage.getInstance();
         // Add data to a patient
         storage.addPatientData(1, 100.0, "HeartRate", 1714376789050L);
 
@@ -79,6 +84,7 @@ class DataStorageTest {
 
     @Test
     void testGetAllPatients() {
+        DataStorage storage = DataStorage.getInstance();
         // Add data for multiple patients
         storage.addPatientData(1, 100.0, "HeartRate", 1714376789050L);
         storage.addPatientData(2, 120.0, "BloodPressure", 1714376789051L);
