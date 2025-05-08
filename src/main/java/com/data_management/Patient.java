@@ -74,4 +74,20 @@ public class Patient {
     }
 
     */
+
+    /*
+     * Checks if this patient has a record of a specific type.
+     * This method iterates through the patient's records to determine if any match the given type.
+     *
+     * @param recordType the type of record to check for, e.g., "HeartRate"
+     * @return true if the patient has a record of the specified type, false otherwise
+     */
+    public boolean hasRecord(String recordType) {
+        for (PatientRecord record : patientRecords) {
+            if (record.getRecordType().equals(recordType)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

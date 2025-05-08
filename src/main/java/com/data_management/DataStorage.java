@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.alerts.AlertGenerator;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * Manages storage and retrieval of patient data within a healthcare monitoring
@@ -13,7 +15,7 @@ import com.alerts.AlertGenerator;
  * patient IDs.
  */
 public class DataStorage {
-    private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
+    private Map<Integer, Patient> patientMap = new ConcurrentHashMap<>(); // Stores patient objects indexed by their unique patient ID.
     private DataReader dataReader;
     private static DataStorage instance; // Singleton instance of DataStorage
     /**
@@ -49,12 +51,21 @@ public class DataStorage {
      *                         milliseconds since the Unix epoch
      */
     public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
-        Patient patient = patientMap.get(patientId);
+        Patient patient = patientMap.computeIfAbsent(patientId, id -> new Patient(id));
+
+        synchronized (patient) {
+            if (!patient.hasRecord(recordType)) {
+                patient.addRecord(measurementValue, recordType, timestamp);
+            }
+        }
+        
+        
+        /*Patient patient = patientMap.get(patientId);
         if (patient == null) {
             patient = new Patient(patientId);
             patientMap.put(patientId, patient);
         }
-        patient.addRecord(measurementValue, recordType, timestamp);
+        patient.addRecord(measurementValue, recordType, timestamp);*/
     }
 
     /**
@@ -120,8 +131,22 @@ public class DataStorage {
             alertGenerator.evaluateData(patient);
         }
     }
-    
+
+    /// Clears all patient data from the storage
     public void clear() {
         this.patientMap.clear();
+    }
+
+    /// Checks if a patient has a specific type of record
+    public boolean hasRecord(int patientId, String recordType) {
+        Patient patient = patientMap.get(patientId);
+        if (patient == null) return false;
+    
+        for (PatientRecord record : patient.getAllRecords()) {
+            if (record.getRecordType().equals(recordType)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
