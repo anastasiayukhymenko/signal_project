@@ -2,6 +2,7 @@ package com.data_management;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.*;
 import java.util.stream.Stream;
 
@@ -52,4 +53,11 @@ public class FileDataReader implements DataReader {
             }
         }
     }
+
+    @Override
+    public void startStreaming(DataStorage dataStorage, URI serverUri) throws IOException {}
+        
+
+    @Override
+    public void stopStreaming() throws IOException {}
 }

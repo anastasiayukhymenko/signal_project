@@ -61,6 +61,7 @@ class FileDataReaderTest {
 
     @Test
     void testHandlesMalformedLinesGracefully() throws IOException {
+        DataStorage.getInstance().clear();
         Files.writeString(testFile, "\nBAD_LINE\n123,abc,BadType,XYZ\n", StandardOpenOption.APPEND);
 
         DataStorage dataStorage = DataStorage.getInstance();
