@@ -27,4 +27,5 @@ public interface DataReader {
      * @throws IOException if an error occurs during disconnection
      */
     void stopStreaming() throws IOException;
+    
 }
