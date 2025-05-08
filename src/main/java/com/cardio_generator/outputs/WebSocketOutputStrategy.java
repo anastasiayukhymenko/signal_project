@@ -2,14 +2,13 @@ package com.cardio_generator.outputs;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.server.WebSocketServer;
-
 import java.net.InetSocketAddress;
 
 public class WebSocketOutputStrategy implements OutputStrategy {
 
     private WebSocketServer server;
 
-    // Constructor: Starts WebSocket server on a specific port
+    //starts WebSocket server on a specific port
     public WebSocketOutputStrategy(int port) {
         server = new SimpleWebSocketServer(new InetSocketAddress(port));
         System.out.println("WebSocket server created on port: " + port + ", listening for connections...");
@@ -27,21 +26,20 @@ public class WebSocketOutputStrategy implements OutputStrategy {
      */
     @Override
     public void output(int patientId, long timestamp, String label, String data) {
-        // Format the message correctly
+
+        //format the message correctly
         String message = String.format("%d,%d,%s,%s", patientId, timestamp, label, data);
 
-        // Broadcast the message to all connected clients
+        //broadcast the message to all connected clients
         for (WebSocket conn : server.getConnections()) {
             conn.send(message);  // Sends the message to each connected client
         }
 
-        // Optionally log the message being sent for debugging
+        //optionally log the message being sent for debugging
         System.out.println("Broadcasting message: " + message);
     }
 
-    /**
-     * Simple WebSocket server implementation for handling connections.
-     */
+    //WebSocket server implementation for handling connections.
     private static class SimpleWebSocketServer extends WebSocketServer {
 
         public SimpleWebSocketServer(InetSocketAddress address) {
@@ -60,7 +58,7 @@ public class WebSocketOutputStrategy implements OutputStrategy {
 
         @Override
         public void onMessage(WebSocket conn, String message) {
-            // No need to handle incoming messages in this context
+            // Not used in this context 
         }
 
         @Override

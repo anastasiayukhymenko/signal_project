@@ -3,7 +3,6 @@ package com.cardio_generator.outputs;
 import com.data_management.DataStorage;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-
 import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,7 +11,7 @@ public class HealthDataWebSocketClient extends WebSocketClient {
 
     private final DataStorage dataStorage;
     private final URI serverUri;
-    private static final int RECONNECT_DELAY_MS = 5000;
+    private static final int reconnectDelay = 5000; // = 5 seconds
     private boolean reconnecting = false;
 
 
@@ -30,7 +29,6 @@ public class HealthDataWebSocketClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        // Expected format: patientId,timestamp,label,data
         try {
             String[] parts = message.split(",", 4);
             if (parts.length != 4) {
@@ -43,7 +41,7 @@ public class HealthDataWebSocketClient extends WebSocketClient {
             String label = parts[2];
             double measurement = Double.parseDouble(parts[3]);
 
-            // Store the parsed data
+            // Store the data in the DataStorage instance
             dataStorage.addPatientData(patientId, measurement, label, timestamp);
             System.out.println("Stored: " + message);
         } catch (Exception e) {
@@ -52,12 +50,14 @@ public class HealthDataWebSocketClient extends WebSocketClient {
         }
     }
 
+    //called when the connection is closed
     @Override
     public void onClose(int code, String reason, boolean remote) {
         System.out.println("Connection closed: " + reason);
         attemptReconnect();
     }
 
+    //called when an error occurs
     @Override
     public void onError(Exception ex) {
         System.err.println("WebSocket error:");
@@ -65,12 +65,14 @@ public class HealthDataWebSocketClient extends WebSocketClient {
         attemptReconnect();
     }
 
+    //called when the connection is opened
     private void attemptReconnect() {
         if (reconnecting) return;
 
         reconnecting = true;
-        System.out.println("Attempting to reconnect in " + (RECONNECT_DELAY_MS / 1000) + " seconds...");
+        System.out.println("Attempting to reconnect in " + (reconnectDelay / 1000) + " seconds...");
 
+        // Schedules a reconnection attempt after the specified delay time
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -83,6 +85,6 @@ public class HealthDataWebSocketClient extends WebSocketClient {
                     reconnecting = false;
                 }
             }
-        }, RECONNECT_DELAY_MS);
+        }, reconnectDelay);
     }
 }

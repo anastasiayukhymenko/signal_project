@@ -16,112 +16,99 @@ import java.util.List;
 class AlertGeneratorTest {
 
     private AlertGenerator alertGenerator;
-    private Patient mockPatient;
-    private DataStorage mockDataStorage;
+    private Patient testPatient;
+    private DataStorage testDataStorage;
 
     @BeforeEach
     void setUp() {
-        mockDataStorage = mock(DataStorage.class);
-        mockPatient = mock(Patient.class);
-        alertGenerator = new AlertGenerator(mockDataStorage);
+        testDataStorage = mock(DataStorage.class);
+        testPatient = mock(Patient.class);
+        alertGenerator = new AlertGenerator(testDataStorage);
     }
 
     @Test
     void testEvaluateECGAbnormalities() {
-        // Arrange
-        List<PatientRecord> mockECGData = List.of(
-                new PatientRecord(1, 0.95, "ECG", System.currentTimeMillis())
+        
+        List<PatientRecord> testECGData = List.of(
+                new PatientRecord(1, 0.97, "ECG", System.currentTimeMillis())
         );
-        when(mockPatient.getAllRecords()).thenReturn(mockECGData);
+        when(testPatient.getAllRecords()).thenReturn(testECGData);
 
-        // Act
-        alertGenerator.evaluateECGAbnormalities(mockPatient);
+        alertGenerator.evaluateECGAbnormalities(testPatient);
 
-        // Assert
-        verify(mockPatient).getAllRecords();
+        verify(testPatient).getAllRecords();
     }
 
     @Test
     void testEvaluateBloodPressureTrends() {
-        // Arrange
-        List<PatientRecord> mockBPData = List.of(
-                new PatientRecord(1, 130, "BloodPressureSystolic", System.currentTimeMillis()),
-                new PatientRecord(1, 135, "BloodPressureSystolic", System.currentTimeMillis() + 1000),
-                new PatientRecord(1, 140, "BloodPressureSystolic", System.currentTimeMillis() + 2000)
+        List<PatientRecord> testBloodPressureData = List.of(
+                new PatientRecord(1, 129, "Blood Pressure Systolic", System.currentTimeMillis()),
+                new PatientRecord(1, 136, "Blood Pressure Systolic", System.currentTimeMillis() + 1000),
+                new PatientRecord(1, 142, "Blood Pressure Systolic", System.currentTimeMillis() + 2000)
         );
-        when(mockPatient.getAllRecords()).thenReturn(mockBPData);
+        when(testPatient.getAllRecords()).thenReturn(testBloodPressureData);
 
-        // Act
-        alertGenerator.evaluateBloodPressureTrends(mockPatient);
+        alertGenerator.evaluateBloodPressureTrends(testPatient);
 
-        // Assert
-        verify(mockPatient).getAllRecords();
+        verify(testPatient).getAllRecords();
     }
 
     @Test
     void testEvaluateHypotensiveHypoxemia() {
-        // Arrange
         List<PatientRecord> mockData = List.of(
-                new PatientRecord(1, 85, "BloodPressureSystolic", System.currentTimeMillis()),
-                new PatientRecord(1, 88, "OxygenSaturation", System.currentTimeMillis())
+                new PatientRecord(1, 85, "Blood Pressure Systolic", System.currentTimeMillis()),
+                new PatientRecord(1, 88, "Oxygen Saturation", System.currentTimeMillis())
         );
-        when(mockPatient.getAllRecords()).thenReturn(mockData);
+        when(testPatient.getAllRecords()).thenReturn(mockData);
 
-        // Act
-        alertGenerator.evaluateHypotensiveHypoxemia(mockPatient);
+        alertGenerator.evaluateHypotensiveHypoxemia(testPatient);
 
-        // Assert
-        verify(mockPatient).getAllRecords();
+        verify(testPatient).getAllRecords();
     }
 
     @Test
     void testEvaluateTriggeredAlert() {
-        // Arrange
         Patient mockPatient = mock(Patient.class);
 
-        // Act
         alertGenerator.evaluateTriggeredAlert(mockPatient);
 
-        // Assert
-        // You can verify interactions with the mockPatient or internal behavior if applicable
-        verify(mockPatient, atLeast(0)).getAllRecords(); // for example, if that method is used
+        verify(mockPatient, atLeast(0)).getAllRecords(); 
     }
-    class TestableAlertGenerator extends AlertGenerator {
+
+    class TestAlertGenerator extends AlertGenerator {
         List<Alert> triggeredAlerts = new ArrayList<>();
 
-        public TestableAlertGenerator() {
+        public TestAlertGenerator() {
             super(null);
         }
 
         @Override
         protected void triggerAlert(Alert alert) {
-            triggeredAlerts.add(alert); // Capture alerts for inspection
+            triggeredAlerts.add(alert);
         }
 
         public List<Alert> getTriggeredAlerts() {
             return triggeredAlerts;
         }
     }
+
     @Test
     void testEvaluateBloodSaturation_triggersLowAndRapidDropAlerts() {
         long now = System.currentTimeMillis();
 
-        List<PatientRecord> mockRecords = List.of(
-                new PatientRecord(1, 97.0, "OxygenSaturation", now - 9 * 60 * 1000L), // Normal
-                new PatientRecord(1, 91.0, "OxygenSaturation", now)                   // Low and rapid drop
+        List<PatientRecord> testRecords = List.of(
+                new PatientRecord(1, 97.0, "Oxygen Saturation", now - 9 * 60 * 1000L), //Normal
+                new PatientRecord(1, 90.0, "Oxygen Saturation", now) //Low and rapid drop
         );
 
-        Patient mockPatient = mock(Patient.class);
-        when(mockPatient.getAllRecords()).thenReturn(mockRecords);
-        when(mockPatient.getPatientId()).thenReturn(1);
+        Patient testPatient = mock(Patient.class);
+        when(testPatient.getAllRecords()).thenReturn(testRecords);
+        when(testPatient.getPatientId()).thenReturn(1);
 
-        // Use the testable subclass to capture alerts
-        TestableAlertGenerator alertGenerator = new TestableAlertGenerator();
+        TestAlertGenerator alertGenerator = new TestAlertGenerator();
 
-        // Act
-        alertGenerator.evaluateBloodSaturation(mockPatient);
+        alertGenerator.evaluateBloodSaturation(testPatient);
 
-        // Assert
         List<Alert> alerts = alertGenerator.getTriggeredAlerts();
         assertEquals(2, alerts.size());
 
@@ -133,7 +120,4 @@ class AlertGeneratorTest {
         assertEquals("1", alert2.getPatientId());
         assertEquals("Rapid Oxygen Saturation Drop (≥5% in 10 mins)", alert2.getCondition());
     }
-
-
-
 }

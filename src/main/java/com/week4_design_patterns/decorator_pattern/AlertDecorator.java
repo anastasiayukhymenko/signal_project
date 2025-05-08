@@ -1,6 +1,7 @@
 package com.week4_design_patterns.decorator_pattern;
 
 public class AlertDecorator implements Alert {
+
     private Alert alert;
     private String additionalInfo;
 
@@ -32,5 +33,4 @@ public class AlertDecorator implements Alert {
                 ", timestamp=" + getTimestamp() +
                 '}';
     }
-    
 }
