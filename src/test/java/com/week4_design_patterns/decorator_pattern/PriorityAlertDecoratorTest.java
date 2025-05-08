@@ -2,7 +2,6 @@ package com.week4_design_patterns.decorator_pattern;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -14,7 +13,7 @@ public class PriorityAlertDecoratorTest {
     @BeforeEach
     public void setUp() {
         baseAlert = mock(Alert.class);
-        when(baseAlert.getPatientId()).thenReturn("P456");
+        when(baseAlert.getPatientId()).thenReturn("P454");
         when(baseAlert.getCondition()).thenReturn("Low Oxygen");
         when(baseAlert.getTimestamp()).thenReturn(1714709999L);
 
@@ -23,7 +22,7 @@ public class PriorityAlertDecoratorTest {
 
     @Test
     public void testGetPatientId() {
-        assertEquals("P456", priorityAlert.getPatientId());
+        assertEquals("P454", priorityAlert.getPatientId());
     }
 
     @Test
@@ -38,7 +37,7 @@ public class PriorityAlertDecoratorTest {
 
     @Test
     public void testToString() {
-        String expected = "Alert{patientId='P456', condition='Low Oxygen - Priority: HIGH', timestamp=1714709999}, Priority Level: HIGH";
+        String expected = "Alert{patientId='P454', condition='Low Oxygen - Priority: HIGH', timestamp=1714709999}, Priority Level: HIGH";
         assertEquals(expected, priorityAlert.toString());
     }
 }
