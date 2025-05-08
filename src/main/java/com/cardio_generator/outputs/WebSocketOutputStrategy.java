@@ -9,21 +9,39 @@ public class WebSocketOutputStrategy implements OutputStrategy {
 
     private WebSocketServer server;
 
+    // Constructor: Starts WebSocket server on a specific port
     public WebSocketOutputStrategy(int port) {
         server = new SimpleWebSocketServer(new InetSocketAddress(port));
         System.out.println("WebSocket server created on port: " + port + ", listening for connections...");
         server.start();
     }
 
+    /**
+     * Output the formatted data message to all connected clients.
+     * This method ensures that each message contains patientId, timestamp, label, and measurement data.
+     *
+     * @param patientId ID of the patient
+     * @param timestamp Timestamp of the data
+     * @param label Type of the data (e.g., "HeartRate", "BloodPressure")
+     * @param data The actual measurement data (e.g., heart rate value)
+     */
     @Override
     public void output(int patientId, long timestamp, String label, String data) {
+        // Format the message correctly
         String message = String.format("%d,%d,%s,%s", patientId, timestamp, label, data);
+
         // Broadcast the message to all connected clients
         for (WebSocket conn : server.getConnections()) {
-            conn.send(message);
+            conn.send(message);  // Sends the message to each connected client
         }
+
+        // Optionally log the message being sent for debugging
+        System.out.println("Broadcasting message: " + message);
     }
 
+    /**
+     * Simple WebSocket server implementation for handling connections.
+     */
     private static class SimpleWebSocketServer extends WebSocketServer {
 
         public SimpleWebSocketServer(InetSocketAddress address) {
@@ -42,7 +60,7 @@ public class WebSocketOutputStrategy implements OutputStrategy {
 
         @Override
         public void onMessage(WebSocket conn, String message) {
-            // Not used in this context
+            // No need to handle incoming messages in this context
         }
 
         @Override

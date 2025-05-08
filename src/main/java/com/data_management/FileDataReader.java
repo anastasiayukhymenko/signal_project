@@ -12,7 +12,13 @@ public class FileDataReader implements DataReader {
     public FileDataReader(String directoryPath) {
         this.directoryPath = directoryPath;
     }
-
+    /**
+     * Reads data from CSV files in the specified directory and stores it in the
+     * provided DataStorage.
+     *
+     * @param dataStorage the storage where data will be stored
+     * @throws IOException if there is an error reading the data
+     */
     @Override
     public void readData(DataStorage dataStorage) throws IOException {
         Path path = Paths.get(directoryPath);

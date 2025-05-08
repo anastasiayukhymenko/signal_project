@@ -31,7 +31,6 @@ class FileDataReaderTest {
         Files.deleteIfExists(tempDir);
     }
 
-
     @Test
     void testReadDataAddsRecordsCorrectly() throws IOException {
         DataStorage.getInstance().clear();
@@ -58,7 +57,6 @@ class FileDataReaderTest {
         assertEquals("BloodPressure", secondRecord.getRecordType());
     }
 
-
     @Test
     void testHandlesMalformedLinesGracefully() throws IOException {
         DataStorage.getInstance().clear();
@@ -81,6 +79,75 @@ class FileDataReaderTest {
     @Test
     void testInvalidDirectoryThrowsException() {
         FileDataReader reader = new FileDataReader("invalid/path");
+        DataStorage dataStorage = DataStorage.getInstance();
+
+        assertThrows(IOException.class, () -> reader.readData(dataStorage));
+    }
+
+    @Test
+    void testHandlesMissingPatientId() throws IOException {
+        // Testing malformed line without patient ID
+        Files.writeString(testFile, ", 98.6, Temperature, 1714720000000\n", StandardOpenOption.APPEND);
+
+        DataStorage.getInstance().clear();
+        DataStorage dataStorage = DataStorage.getInstance();
+        FileDataReader reader = new FileDataReader(tempDir.toString());
+
+        assertDoesNotThrow(() -> reader.readData(dataStorage));
+
+        // The malformed line should not be processed
+        List<PatientRecord> allRecords = dataStorage.getAllPatients()
+                .stream()
+                .flatMap(p -> p.getAllRecords().stream())
+                .collect(Collectors.toList());
+
+        assertEquals(3, allRecords.size()); // Only the previous valid records should be there
+    }
+
+    @Test
+    void testHandlesInvalidValueFormat() throws IOException {
+        // Testing malformed line with an invalid measurement value (non-numeric)
+        Files.writeString(testFile, "103, abc, Temperature, 1714720003000\n", StandardOpenOption.APPEND);
+
+        DataStorage.getInstance().clear();
+        DataStorage dataStorage = DataStorage.getInstance();
+        FileDataReader reader = new FileDataReader(tempDir.toString());
+
+        assertDoesNotThrow(() -> reader.readData(dataStorage));
+
+        // The malformed line should not be processed
+        List<PatientRecord> allRecords = dataStorage.getAllPatients()
+                .stream()
+                .flatMap(p -> p.getAllRecords().stream())
+                .collect(Collectors.toList());
+
+        assertEquals(3, allRecords.size()); // Only the previous valid records should be there
+    }
+
+    @Test
+    void testHandlesInvalidTimestamp() throws IOException {
+        // Testing malformed line with an invalid timestamp
+        Files.writeString(testFile, "104, 101.5, Temperature, not-a-timestamp\n", StandardOpenOption.APPEND);
+
+        DataStorage.getInstance().clear();
+        DataStorage dataStorage = DataStorage.getInstance();
+        FileDataReader reader = new FileDataReader(tempDir.toString());
+
+        assertDoesNotThrow(() -> reader.readData(dataStorage));
+
+        // The malformed line should not be processed
+        List<PatientRecord> allRecords = dataStorage.getAllPatients()
+                .stream()
+                .flatMap(p -> p.getAllRecords().stream())
+                .collect(Collectors.toList());
+
+        assertEquals(3, allRecords.size()); // Only the previous valid records should be there
+    }
+
+    @Test
+    void testHandlesFileNotFoundGracefully() {
+        // Create a reader with a non-existing file
+        FileDataReader reader = new FileDataReader("non_existent_directory");
         DataStorage dataStorage = DataStorage.getInstance();
 
         assertThrows(IOException.class, () -> reader.readData(dataStorage));
