@@ -30,6 +30,18 @@
             <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.7.0</version> <!-- Or latest version -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.7.0</version> <!-- Or latest version -->
+            <scope>test</scope>
+        </dependency>
 
         <!-- Mockito for mocking in tests -->
         <dependency>
@@ -44,6 +56,11 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>5.17.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.32</version> <!-- Check for latest version -->
         </dependency>
     </dependencies>
 

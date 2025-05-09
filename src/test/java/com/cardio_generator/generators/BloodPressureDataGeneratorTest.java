@@ -15,7 +15,7 @@ class BloodPressureDataGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        generator = new BloodPressureDataGenerator(3); // 3 patients
+        generator = new BloodPressureDataGenerator(333);
         mockOutput = mock(OutputStrategy.class);
     }
 
@@ -34,24 +34,23 @@ class BloodPressureDataGeneratorTest {
                 idCaptor.capture(), timeCaptor.capture(), labelCaptor.capture(), valueCaptor.capture()
         );
 
-        // Validate both Systolic and Diastolic values
         for (int i = 0; i < 2; i++) {
             String label = labelCaptor.getAllValues().get(i);
             double value = Double.parseDouble(valueCaptor.getAllValues().get(i));
 
             if (label.equals("SystolicPressure")) {
-                assertTrue(value >= 90 && value <= 180, "Systolic value should be between 90 and 180");
+                assertTrue(value >= 90 && value <= 180, "Systolic Pressure should be between 90 and 180");
             } else if (label.equals("DiastolicPressure")) {
-                assertTrue(value >= 60 && value <= 120, "Diastolic value should be between 60 and 120");
+                assertTrue(value >= 60 && value <= 120, "Diastolic Pressure should be between 60 and 120");
             } else {
-                fail("Unexpected label: " + label);
+                fail("Unexpected name: " + label);
             }
         }
     }
 
     @Test
     void testGenerate_usesCorrectLabels() {
-        generator.generate(2, mockOutput);
+        generator.generate(23, mockOutput);
 
         ArgumentCaptor<String> labelCaptor = ArgumentCaptor.forClass(String.class);
         verify(mockOutput, times(2)).output(anyInt(), anyLong(), labelCaptor.capture(), anyString());
@@ -62,8 +61,8 @@ class BloodPressureDataGeneratorTest {
 
     @Test
     void testGenerate_multiplePatients() {
-        generator.generate(1, mockOutput);
-        generator.generate(2, mockOutput);
+        generator.generate(13, mockOutput);
+        generator.generate(23, mockOutput);
 
         verify(mockOutput, times(4)).output(anyInt(), anyLong(), anyString(), anyString());
     }

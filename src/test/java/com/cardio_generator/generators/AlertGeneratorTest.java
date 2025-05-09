@@ -20,18 +20,18 @@ public class AlertGeneratorTest {
 
     @BeforeEach
     public void setUp() {
-        alertGenerator = new AlertGenerator(10); // handles up to patientId 10
+        alertGenerator = new AlertGenerator(33);
     }
 
     @Test
     public void testAlertTriggered() {
-        AlertGenerator.randomGenerator.setSeed(42); // deterministic seed
+        AlertGenerator.randomGenerator.setSeed(42);
 
         for (int i = 0; i < 100; i++) {
-            alertGenerator.generate(1, mockOutput);
+            alertGenerator.generate(12, mockOutput);
         }
 
-        verify(mockOutput, atLeastOnce()).output(eq(1), anyLong(), eq("Alert"), eq("triggered"));
+        verify(mockOutput, atLeastOnce()).output(eq(12), anyLong(), eq("Alert"), eq("triggered"));
     }
 
     @Test
@@ -39,16 +39,16 @@ public class AlertGeneratorTest {
         AlertGenerator.randomGenerator.setSeed(123);
 
         for (int i = 0; i < 100; i++) {
-            alertGenerator.generate(2, mockOutput); // should trigger
+            alertGenerator.generate(22, mockOutput);
         }
 
         AlertGenerator.randomGenerator.setSeed(123);
 
         for (int i = 0; i < 100; i++) {
-            alertGenerator.generate(2, mockOutput); // should resolve
+            alertGenerator.generate(22, mockOutput);
         }
 
-        verify(mockOutput, atLeastOnce()).output(eq(2), anyLong(), eq("Alert"), eq("triggered"));
-        verify(mockOutput, atLeastOnce()).output(eq(2), anyLong(), eq("Alert"), eq("resolved"));
+        verify(mockOutput, atLeastOnce()).output(eq(22), anyLong(), eq("Alert"), eq("triggered"));
+        verify(mockOutput, atLeastOnce()).output(eq(22), anyLong(), eq("Alert"), eq("resolved"));
     }
 }

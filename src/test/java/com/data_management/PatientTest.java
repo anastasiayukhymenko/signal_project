@@ -13,24 +13,24 @@ class PatientTest {
 
     @BeforeEach
     void setUp() {
-        patient = new Patient(1);
+        patient = new Patient(17);
     }
 
     @Test
     void testGetPatientId() {
-        assertEquals(1, patient.getPatientId());
+        assertEquals(17, patient.getPatientId());
     }
 
     @Test
     void testAddAndGetAllRecords() {
-        patient.addRecord(120.5, "BloodPressure", 1714670000000L);
-        patient.addRecord(72.0, "HeartRate", 1714670100000L);
+        patient.addRecord(125.5, "BloodPressure", 1714670000000L);
+        patient.addRecord(76.0, "HeartRate", 1714670100000L);
 
         List<PatientRecord> records = patient.getAllRecords();
         assertEquals(2, records.size());
 
         PatientRecord first = records.get(0);
-        assertEquals(120.5, first.getMeasurementValue());
+        assertEquals(125.5, first.getMeasurementValue());
         assertEquals("BloodPressure", first.getRecordType());
         assertEquals(1714670000000L, first.getTimestamp());
     }
@@ -41,7 +41,6 @@ class PatientTest {
         patient.addRecord(76.0, "HeartRate", 1714671000000L);
         patient.addRecord(130.0, "BloodPressure", 1714672000000L);
 
-        // Filter between the first and second records
         List<PatientRecord> filtered = patient.getRecords(1714670000000L, 1714671000000L);
         assertEquals(2, filtered.size());
         assertTrue(filtered.stream().anyMatch(r -> r.getRecordType().equals("OxygenSaturation")));

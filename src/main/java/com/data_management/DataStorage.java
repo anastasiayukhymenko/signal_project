@@ -52,20 +52,11 @@ public class DataStorage {
      */
     public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
         Patient patient = patientMap.computeIfAbsent(patientId, id -> new Patient(id));
-
         synchronized (patient) {
-            if (!patient.hasRecord(recordType)) {
-                patient.addRecord(measurementValue, recordType, timestamp);
-            }
+            patient.addRecord(measurementValue, recordType, timestamp);
         }
-        
-        
-        /*Patient patient = patientMap.get(patientId);
-        if (patient == null) {
-            patient = new Patient(patientId);
-            patientMap.put(patientId, patient);
-        }
-        patient.addRecord(measurementValue, recordType, timestamp);*/
+
+
     }
 
     /**
@@ -132,12 +123,12 @@ public class DataStorage {
         }
     }
 
-    /// Clears all patient data from the storage
+    // Clears all patient data from the storage
     public void clear() {
         this.patientMap.clear();
     }
 
-    /// Checks if a patient has a specific type of record
+    // Checks if a patient has a specific type of record
     public boolean hasRecord(int patientId, String recordType) {
         Patient patient = patientMap.get(patientId);
         if (patient == null) return false;

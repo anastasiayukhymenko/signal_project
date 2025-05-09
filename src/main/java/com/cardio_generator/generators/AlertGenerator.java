@@ -5,7 +5,7 @@ import java.util.Random;
 import com.cardio_generator.outputs.OutputStrategy;
 
 /**
- * AlertGenerator creates random alert messages for each patient.
+ * AlertGenerator creates random alert messages for patient
  * It either triggers a new alert or resolves an existing one
  */
 
@@ -18,8 +18,7 @@ public class AlertGenerator implements PatientDataGenerator {
     private boolean[] alertStates; // false = resolved, true = pressed
 
     /**
-     * Creates an {@code AlertGenerator} for a given number of patients.
-     *
+     * Creates {@code AlertGenerator} for a given number of patients.
      * @param patientCount the total number of patients to generate alert data for
      */
 
@@ -28,13 +27,12 @@ public class AlertGenerator implements PatientDataGenerator {
     }
 
     /**
-     * Generates alert data for a specific patient.
+     * Generates alert for a specific patient.
+     * If alert is already active there's a 90% chance it will be resolved.
+     * If no alert is active - small chance a new alert will be triggered.
      *
-     * If an alert is already active, there is a 90% chance it will be resolved.
-     * If no alert is active, there is small chance a new alert will be triggered.
-     *
-     * @param patientId      the ID of the patient for whom to generate alert data
-     * @param outputStrategy how the alert should be displayed or output
+     * @param patientId      the ID of the patient for whom to generate alert
+     * @param outputStrategy how the alert should be displayed
      */
 
     @Override
@@ -43,7 +41,6 @@ public class AlertGenerator implements PatientDataGenerator {
             if (alertStates[patientId]) {
                 if (randomGenerator.nextDouble() < 0.9) { // 90% chance to resolve
                     alertStates[patientId] = false;
-                    // Output the alert
                     outputStrategy.output(patientId, System.currentTimeMillis(), "Alert", "resolved");
                 }
             } else {

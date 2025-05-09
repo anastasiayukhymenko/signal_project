@@ -6,9 +6,8 @@ import com.cardio_generator.outputs.OutputStrategy;
 
 /**
  * BloodSaturationDataGenerator creates fake blood saturation values for patients.
- *
- * Each patient starts with a value between 95% and 100%, and their value changes slightly
- * each time the data is generated, which simulates realistic and healthy fluctuations in blood saturation.
+ * Each patient starts with a value between 95% and 100% then their value changes a bit
+ * each time the data is generated which simulates realistic fluctuations in blood saturation.
  */
 
 public class BloodSaturationDataGenerator implements PatientDataGenerator {
@@ -20,8 +19,7 @@ public class BloodSaturationDataGenerator implements PatientDataGenerator {
 
     /**
      * {@code BloodSaturationDataGenerator} sets up the generator with a starting saturation value for each patient.
-     *
-     * @param patientCount the number of patients to generate data for
+     * @param patientCount  number of patients to generate data for
      */
 
     public BloodSaturationDataGenerator(int patientCount) {
@@ -36,11 +34,9 @@ public class BloodSaturationDataGenerator implements PatientDataGenerator {
 
     /**
      * {@code generate} generates and sends updated blood saturation data for a specific patient.
-     *
-     * The value can increase or decrease by 1% (or stay the same), and stays between 90% and 100%.
-     *
+     * The value can increase or decrease by 1% (or stay the same) and stays between 90% and 100%.
      * @param patientId      the ID of the patient
-     * @param outputStrategy the way the generated data should be sent or displayed
+     * @param outputStrategy how generated data should be sent/displayed
      */
 
     @Override

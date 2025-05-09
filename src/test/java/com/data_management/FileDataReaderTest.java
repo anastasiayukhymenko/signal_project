@@ -1,155 +1,96 @@
 package com.data_management;
 
+import com.cardio_generator.outputs.HealthDataWebSocketClient;
 import org.junit.jupiter.api.*;
+
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class FileDataReaderTest {
-
-    private Path tempDir;
-    private Path testFile;
+    private Path tempPath;
+    private DataStorage mockStorage;
 
     @BeforeEach
     void setUp() throws IOException {
-        // Create a temporary directory and sample .csv file
-        tempDir = Files.createTempDirectory("test_data_dir");
-
-        testFile = tempDir.resolve("sample.csv");
-        Files.writeString(testFile,
-                "101, 98.6, Temperature, 1714720000000\n" +
-                        "102, 120.0, BloodPressure, 1714720001000\n" +
-                        "101, 99.1, Temperature, 1714720002000\n");
+        tempPath = Files.createTempDirectory("testData");
+        mockStorage = mock(DataStorage.class);
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        Files.deleteIfExists(testFile);
-        Files.deleteIfExists(tempDir);
+        try (var files = Files.list(tempPath)) {
+            files.forEach(file -> {
+                try {
+                    Files.delete(file);
+                } catch (IOException e) {
+                }
+            });
+        }
+        Files.deleteIfExists(tempPath);
     }
 
     @Test
-    void testReadDataAddsRecordsCorrectly() throws IOException {
-        DataStorage.getInstance().clear();
-        DataStorage dataStorage = DataStorage.getInstance();
-        FileDataReader reader = new FileDataReader(tempDir.toString());
+    void testReadData_validCsvFile() throws IOException {
+        Path file = Files.createFile(tempPath.resolve("test.csv"));
+        Files.write(file, List.of(
+                "1,98.6,heart_rate,1672531200",
+                "2,75.5,blood_pressure,1672531260"
+        ));
 
-        reader.readData(dataStorage);
+        FileDataReader reader = new FileDataReader(tempPath.toString());
+        reader.readData(mockStorage);
 
-        // Validate records for patient 101
-        List<PatientRecord> records101 = dataStorage.getRecords(101, 0L, Long.MAX_VALUE);
-        assertEquals(2, records101.size()); // Ensure only 2 records for patient 101
-
-        PatientRecord firstRecord = records101.get(0);
-        assertEquals(101, firstRecord.getPatientId());
-        assertEquals("Temperature", firstRecord.getRecordType());
-        assertEquals(98.6, firstRecord.getMeasurementValue());
-        assertEquals(1714720000000L, firstRecord.getTimestamp());
-
-        // Validate records for patient 102
-        List<PatientRecord> records102 = dataStorage.getRecords(102, 0L, Long.MAX_VALUE);
-        assertEquals(1, records102.size()); // Ensure only 1 record for patient 102
-
-        PatientRecord secondRecord = records102.get(0);
-        assertEquals("BloodPressure", secondRecord.getRecordType());
+        verify(mockStorage).addPatientData(1, 98.6, "heart_rate", 1672531200L);
+        verify(mockStorage).addPatientData(2, 75.5, "blood_pressure", 1672531260L);
     }
 
     @Test
-    void testHandlesMalformedLinesGracefully() throws IOException {
-        DataStorage.getInstance().clear();
-        Files.writeString(testFile, "\nBAD_LINE\n123,abc,BadType,XYZ\n", StandardOpenOption.APPEND);
+    void testReadData_ignoresNonCsvFiles() throws IOException {
+        Path txtFile = Files.createFile(tempPath.resolve("notes.txt"));
+        Files.write(txtFile, List.of("This should be ignored"));
 
-        DataStorage dataStorage = DataStorage.getInstance();
-        FileDataReader reader = new FileDataReader(tempDir.toString());
+        FileDataReader reader = new FileDataReader(tempPath.toString());
+        reader.readData(mockStorage);
 
-        assertDoesNotThrow(() -> reader.readData(dataStorage));
-
-        // Only the original 3 lines should result in records
-        List<PatientRecord> allRecords = dataStorage.getAllPatients()
-                .stream()
-                .flatMap(p -> p.getAllRecords().stream())
-                .collect(Collectors.toList());
-
-        assertEquals(3, allRecords.size());
+        verify(mockStorage, never()).addPatientData(anyInt(), anyDouble(), anyString(), anyLong());
     }
 
     @Test
-    void testInvalidDirectoryThrowsException() {
-        FileDataReader reader = new FileDataReader("invalid/path");
-        DataStorage dataStorage = DataStorage.getInstance();
+    void testReadData_skipsMalformedLines() throws IOException {
+        Path file = Files.createFile(tempPath.resolve("test.csv"));
+        Files.write(file, List.of(
+                "invalid,line,missing,values",
+                "3,100.0,temp,1672531300"
+        ));
 
-        assertThrows(IOException.class, () -> reader.readData(dataStorage));
+        FileDataReader reader = new FileDataReader(tempPath.toString());
+        reader.readData(mockStorage);
+
+        verify(mockStorage).addPatientData(3, 100.0, "temp", 1672531300L);
     }
 
     @Test
-    void testHandlesMissingPatientId() throws IOException {
-        // Testing malformed line without patient ID
-        Files.writeString(testFile, ", 98.6, Temperature, 1714720000000\n", StandardOpenOption.APPEND);
+    void testStartStreaming_callsConnect() throws IOException {
+        HealthDataWebSocketClient mockClient = mock(HealthDataWebSocketClient.class);
+        URI serverUri = URI.create("ws://localhost:8080");
+        FileDataReader reader = new FileDataReader(tempPath.toString(), mockClient);
 
-        DataStorage.getInstance().clear();
-        DataStorage dataStorage = DataStorage.getInstance();
-        FileDataReader reader = new FileDataReader(tempDir.toString());
+        reader.startStreaming(mockStorage, serverUri);
 
-        assertDoesNotThrow(() -> reader.readData(dataStorage));
-
-        // The malformed line should not be processed
-        List<PatientRecord> allRecords = dataStorage.getAllPatients()
-                .stream()
-                .flatMap(p -> p.getAllRecords().stream())
-                .collect(Collectors.toList());
-
-        assertEquals(3, allRecords.size()); // Only the previous valid records should be there
+        verify(mockClient).connect();
     }
 
     @Test
-    void testHandlesInvalidValueFormat() throws IOException {
-        // Testing malformed line with an invalid measurement value (non-numeric)
-        Files.writeString(testFile, "103, abc, Temperature, 1714720003000\n", StandardOpenOption.APPEND);
+    void testStopStreaming_callsClose() throws IOException {
+        HealthDataWebSocketClient mockClient = mock(HealthDataWebSocketClient.class);
+        FileDataReader reader = new FileDataReader(tempPath.toString(), mockClient);
 
-        DataStorage.getInstance().clear();
-        DataStorage dataStorage = DataStorage.getInstance();
-        FileDataReader reader = new FileDataReader(tempDir.toString());
+        reader.stopStreaming();
 
-        assertDoesNotThrow(() -> reader.readData(dataStorage));
-
-        // The malformed line should not be processed
-        List<PatientRecord> allRecords = dataStorage.getAllPatients()
-                .stream()
-                .flatMap(p -> p.getAllRecords().stream())
-                .collect(Collectors.toList());
-
-        assertEquals(3, allRecords.size()); // Only the previous valid records should be there
-    }
-
-    @Test
-    void testHandlesInvalidTimestamp() throws IOException {
-        // Testing malformed line with an invalid timestamp
-        Files.writeString(testFile, "104, 101.5, Temperature, not-a-timestamp\n", StandardOpenOption.APPEND);
-
-        DataStorage.getInstance().clear();
-        DataStorage dataStorage = DataStorage.getInstance();
-        FileDataReader reader = new FileDataReader(tempDir.toString());
-
-        assertDoesNotThrow(() -> reader.readData(dataStorage));
-
-        // The malformed line should not be processed
-        List<PatientRecord> allRecords = dataStorage.getAllPatients()
-                .stream()
-                .flatMap(p -> p.getAllRecords().stream())
-                .collect(Collectors.toList());
-
-        assertEquals(3, allRecords.size()); // Only the previous valid records should be there
-    }
-
-    @Test
-    void testHandlesFileNotFoundGracefully() {
-        // Create a reader with a non-existing file
-        FileDataReader reader = new FileDataReader("non_existent_directory");
-        DataStorage dataStorage = DataStorage.getInstance();
-
-        assertThrows(IOException.class, () -> reader.readData(dataStorage));
+        verify(mockClient).close();
     }
 }

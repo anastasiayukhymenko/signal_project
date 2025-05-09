@@ -15,13 +15,13 @@ class ECGDataGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        generator = new ECGDataGenerator(10); // Test with 10 patients
+        generator = new ECGDataGenerator(157);
         mockOutputStrategy = mock(OutputStrategy.class);
     }
 
     @Test
     void testGenerateOutputsECGData() {
-        int patientId = 3;
+        int patientId = 39;
 
         generator.generate(patientId, mockOutputStrategy);
 
@@ -43,7 +43,7 @@ class ECGDataGeneratorTest {
 
     @Test
     void testGenerateDoesNotCrashForMultiplePatients() {
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 157; i++) {
             final int patientId = i;
             assertDoesNotThrow(() -> generator.generate(patientId, mockOutputStrategy));
         }

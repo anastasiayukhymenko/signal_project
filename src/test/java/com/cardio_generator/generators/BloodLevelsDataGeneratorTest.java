@@ -12,11 +12,11 @@ class BloodLevelsDataGeneratorTest {
 
     private BloodLevelsDataGenerator generator;
     private OutputStrategy mockOutput;
-    private final int patientId = 1;
+    private final int patientId = 11;
 
     @BeforeEach
     void setUp() {
-        generator = new BloodLevelsDataGenerator(2); // 2 patients (index 1 and 2)
+        generator = new BloodLevelsDataGenerator(22);
         mockOutput = mock(OutputStrategy.class);
     }
 
@@ -24,10 +24,8 @@ class BloodLevelsDataGeneratorTest {
     void testGenerateOutputsThreeBloodMetrics() {
         generator.generate(patientId, mockOutput);
 
-        // Verify output was called 3 times (Cholesterol, WhiteBloodCells, RedBloodCells)
         verify(mockOutput, times(3)).output(eq(patientId), anyLong(), anyString(), anyString());
 
-        // Optional: capture the labels used in output
         ArgumentCaptor<String> labelCaptor = ArgumentCaptor.forClass(String.class);
         verify(mockOutput, times(3)).output(eq(patientId), anyLong(), labelCaptor.capture(), anyString());
 
